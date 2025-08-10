@@ -13,22 +13,21 @@ class TasksViewModel(private val dao: TaskDao) : ViewModel() {
     val tasks: StateFlow<List<Task>> = dao.getAllTasks()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    fun addTask(title: String, description: String, priority: PriorityLevel) {
-        if (title.isBlank()) return
+    fun addTaskFromEntity(task: Task) {
         viewModelScope.launch {
-            dao.insertTask(Task(title = title, description = description, priority = priority))
-        }
-    }
-
-    fun deleteTask(task: Task) {
-        viewModelScope.launch {
-            dao.deleteTask(task)
+            dao.insertTask(task)
         }
     }
 
     fun updateTask(task: Task) {
         viewModelScope.launch {
             dao.updateTask(task)
+        }
+    }
+
+    fun deleteTask(task: Task) {
+        viewModelScope.launch {
+            dao.deleteTask(task)
         }
     }
 }

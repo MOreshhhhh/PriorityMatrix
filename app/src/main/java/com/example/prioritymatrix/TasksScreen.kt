@@ -11,13 +11,14 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun TasksScreen(viewModel: TasksViewModel) {
-    val tasks by viewModel.tasks.collectAsState()
+    val tasks by viewModel.tasks.collectAsState(initial = emptyList())
 
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var selectedPriority by remember { mutableStateOf(PriorityLevel.LOW) }
 
     Column(modifier = Modifier.padding(16.dp)) {
+        // Title field
         OutlinedTextField(
             value = title,
             onValueChange = { title = it },
@@ -28,6 +29,7 @@ fun TasksScreen(viewModel: TasksViewModel) {
         )
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Description field
         OutlinedTextField(
             value = description,
             onValueChange = { description = it },
@@ -36,16 +38,30 @@ fun TasksScreen(viewModel: TasksViewModel) {
         )
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Priority dropdown
         PriorityDropdown(selectedPriority) { selectedPriority = it }
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Add Task button
         Button(
             onClick = {
-                viewModel.addTask(title, description, selectedPriority)
-                title = ""
-                description = ""
-                selectedPriority = PriorityLevel.LOW
+                if (title.isNotBlank()) {
+                    val newTask = Task(
+                        title = title,
+                        description = description,
+                        priority = selectedPriority,
+                        isImportant = selectedPriority != PriorityLevel.LOW, // Example mapping
+                        isUrgent = selectedPriority == PriorityLevel.HIGH,  // Example mapping
+                        isCompleted = false
+                    )
+                    viewModel.addTaskFromEntity(newTask)
+
+                    // Reset fields
+                    title = ""
+                    description = ""
+                    selectedPriority = PriorityLevel.LOW
+                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -54,6 +70,7 @@ fun TasksScreen(viewModel: TasksViewModel) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // Task list
         LazyColumn {
             items(tasks) { task ->
                 TaskItem(task = task, onDelete = { viewModel.deleteTask(task) })

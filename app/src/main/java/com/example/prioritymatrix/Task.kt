@@ -8,7 +8,11 @@ data class Task(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val title: String,
     val description: String,
-    val priority: PriorityLevel
+    val priority: PriorityLevel,
+    val isImportant: Boolean = false,
+    val isUrgent: Boolean = false,
+    val isCompleted: Boolean = false,
+    val dueDateTime: Long? = null // nullable due date in millis
 )
 
 enum class PriorityLevel {
